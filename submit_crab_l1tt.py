@@ -57,6 +57,9 @@ parser.add_argument("-n", "--njobs", dest="njobs", type=int,
                     help="number of input files to process", default=1)
 parser.add_argument("-d", "--outdir", dest="outdir",
                     help="output sub-directory label", default="ntuples")
+parser.add_argument("-p", "--pset", dest="pset",
+                    help="CMSSW pset to run",
+                    default="customise_L1TrackNtupleMaker.py")
 parser.add_argument("-t", "--test", dest="test", action="store_true",
                     help="generate config but do NOT submit", default=False)
 args = parser.parse_args()
@@ -125,7 +128,7 @@ config.General.transferLogs         = True
 
 # ── JobType ──────────────────────────────────────────────────────────────
 config.JobType.pluginName           = 'Analysis'
-config.JobType.psetName             = 'L1NtupleMaker_cfg.py'
+config.JobType.psetName             = '{pset}'
 # Forward the L1 tracking algorithm + output file name to the pset.
 config.JobType.pyCfgParams          = {py_cfg_params}
 # The pset uses TFileService -> {outfile}; CRAB needs this declared
@@ -178,7 +181,7 @@ print('Files to process       : %s' % njobs_str)
 print('Cores / Memory per job : %d / %d MB' % (ncores, memory_mb))
 print('Ignore locality        : True')
 print('Output LFN base        : %s' % eos_lfn_base)
-print('Storage site           : T3_CH_CERNBOX')
+print('Storage site           : T2_CERN_CH')
 print('  -> /eos/user/%s/%s/%s/' % (initial, username, base_out))
 print('──────────────────────────────────────────────')
 
