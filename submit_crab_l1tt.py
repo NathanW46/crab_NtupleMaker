@@ -150,9 +150,9 @@ config.Data.publication             = False
 # Allow jobs to run at ANY site (read input via XRootD) -- faster scheduling
 config.Data.ignoreLocality          = True
 
-config.Site.storageSite             = 'T2_CERN_CH'
+config.Site.storageSite             = 'T3_CH_CERNBOX'
 # Open up scheduling to all T1/T2/T3 sites
-config.Site.whitelist               = ['T1_*', 'T2_*', 'T3_*']
+config.Site.whitelist               = ['T2_CERN_CH']
 """.format(
     request_name     = request_name,
     base_out         = base_out,
@@ -183,7 +183,7 @@ print('Files to process       : %s' % njobs_str)
 print('Cores / Memory per job : %d / %d MB' % (ncores, memory_mb))
 print('Ignore locality        : True')
 print('Output LFN base        : %s' % eos_lfn_base)
-print('Storage site           : T2_CERN_CH')
+print('Storage site           : T3_CH_CERNBOX')
 print('  -> /eos/user/%s/%s/%s/' % (initial, username, base_out))
 print('──────────────────────────────────────────────')
 
