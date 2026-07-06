@@ -98,10 +98,10 @@ request_name = request_name.replace('-', '_').replace(' ', '_')[:100]
 # compute location. i.e. T2_CERN_CH
 eos_lfn_base = '/store/user/%s/%s/' % (username, base_out)
 
-# # totalUnits limits files processed (same role as -n in condor script)
-# total_units_line = ''
-# if args.njobs > 0:
-#     total_units_line = 'config.Data.totalUnits          = %d' % args.njobs
+# totalUnits limits how many files (units) are processed; -1 = whole dataset
+total_units_line = ''
+if args.njobs > 0:
+    total_units_line = 'config.Data.totalUnits          = %d' % args.njobs
 
 # resources: memory defaults to 2500 MB/core
 ncores    = args.cores
@@ -109,8 +109,8 @@ memory_mb = args.storage if args.storage > 0 else 2500 * ncores
 
 # pyCfgParams: forward algorithm + output file name 
 # The pset (customise_L1TrackNtupleMaker.py) reads these via VarParsing.
-py_cfg_params = "['algo=%s', 'outputFile=%s', 'maxEvents=%d']" % (
-    args.algorithm, args.outfile, args.events)
+py_cfg_params = "['algo=%s', 'outputFile=%s', 'maxEvents=%d', 'nThreads=%d']" % (
+    args.algorithm, args.outfile, args.events, ncores)
 
 # create output directory & write CRAB config 
 os.makedirs(base_out, exist_ok=True)
@@ -143,6 +143,7 @@ config.Data.inputDataset            = '{dataset}'
 config.Data.inputDBS                = 'global'
 config.Data.splitting               = 'FileBased'
 config.Data.unitsPerJob             = 1          # one file per job (same as condor)
+{total_units_line}
 config.Data.outLFNDirBase           = '{eos_lfn_base}'
 config.Data.outputDatasetTag        = '{tag}'
 config.Data.publication             = False
@@ -159,6 +160,7 @@ config.Site.whitelist               = ['T1_*', 'T2_*', 'T3_*']
     py_cfg_params    = py_cfg_params,
     outfile          = args.outfile,
     dataset          = ds_name,
+    total_units_line = total_units_line,
     eos_lfn_base     = eos_lfn_base,
     tag              = args.tag,
     memory_mb        = memory_mb,
