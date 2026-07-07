@@ -152,7 +152,7 @@ config.Data.ignoreLocality          = True
 
 config.Site.storageSite             = 'T3_CH_CERNBOX'
 # Open up scheduling to all T1/T2/T3 sites
-config.Site.whitelist               = ['T2_CERN_CH']
+config.Site.whitelist               = ['T1_*', 'T2_*', 'T3_*']
 """.format(
     request_name     = request_name,
     base_out         = base_out,
