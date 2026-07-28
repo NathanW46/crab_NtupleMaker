@@ -1,33 +1,12 @@
-# L1 Track NtupleMaker — CRAB submission
+# Crab Job Helper for TrackFinder
+Creates a crab_cfg.py file and submits it to crab job manager
 
-A small wrapper for running the L1 Track NtupleMaker over a dataset on the grid.
-You give it an algorithm and a sample, it writes a CRAB config and submits it.
+## Options
+- `-n` Number of Events
+- `-t` Number of parallel threads
+- `-s` Sample to use (from dictionary inside submit_crab.py and (must?) match the same dict in N tuple maker)
+- `-algo` Algorithm to use (must be valid for the N tuple Maker)
+- `--test` Create config but do not submit
 
-## Usage 
-
-
-```bash
-python3 submit_crab_l1tt.py HYBRID_DISPLACED DispSUSY_PU200 \
-    -o myntuple.root -a v1 -c 2 -e 500 -n 10
-```
-
-### Options
-
-| Flag | What it does | Default |
-|------|--------------|---------|
-| `algorithm` | L1 tracking algorithm (positional) | — required |
-| `mcsample`  | Sample key (positional) | — required |
-| `-o` | Output ROOT file name | `outputHLT.root` |
-| `-a` | Tag for the output dir / CRAB request | `ntuples` |
-| `-c` | Cores per job | `1` |
-| `-s` | Memory per job in MB (RAM); defaults to `2500 × cores` | auto |
-| `-e` | Max events processed per job | `1000` |
-| `-n` | Number of input files to run over | `1` |
-| `-d` | Output sub-directory label | `ntuples` |
-| `-t` | Write the config but **don't** submit | off |
-
-The algorithm has to be one of:
-`HYBRID`, `HYBRID_DISPLACED`, `HYBRID_NEWKF`, `HYBRID_REDUCED`, `HYBRID_SIM`,
-`HYBRID_SIM_DISPLACED`, `TMTT`, `TRACKLET`.
-
-Samples come from the `sample_dict` near the top of `submit_crab_l1tt.py` 
+## Usage
+`python3 submit_crab.py -n 1000 -t 4 -s SUSY200PU -algo HYBRID_DISPLACED`
