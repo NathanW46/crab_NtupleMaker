@@ -17,8 +17,9 @@ os.makedirs(base_out, exist_ok=True)
 cfg_path = os.path.join(base_out, 'crab_cfg.py')
 
 
-maxMem = 3000
-maxTime = 150
+maxMem = 2000*args.nThreads
+# maxTime = 150
+
 
 samples = {
             "SUSY200PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
@@ -43,13 +44,12 @@ config.General.transferOutputs = True
 config.JobType.psetName = 'custom-L1TrackNtupleMaker_cfg.py'
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.pluginName = 'Analysis'
-config.JobType.maxJobRuntimeMin = {maxTime}
-config.JobType.maxMemoryMB = {maxMem}
 config.JobType.numCores = {nThreads}
+config.JobType.maxMemoryMB = {maxMem}
 
-config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 1
-config.Data.totalUnits = 1
+config.Data.splitting = 'Automatic'
+# config.Data.unitsPerJob = 1
+config.Data.totalUnits = {maxEvents}
 config.Data.publication = False
 
 config.Data.outLFNDirBase = '/store/user/nwhittin/crab_CMSSW_20_1_0_pre1/'
@@ -61,10 +61,12 @@ config.Site.storageSite = 'T3_CH_CERNBOX'
     py_cfg_params    = py_cfg_params,
     nThreads         = args.nThreads,
     sample           = samples[args.sample],
+    maxEvents        = args.maxEvents,
     maxMem           = maxMem,
-    maxTime          = maxTime,
+    # maxTime          = maxTime,
     base_out         = base_out,
 )
+# Other unused options:
 
 
 with open(cfg_path, 'w') as f:
