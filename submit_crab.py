@@ -3,27 +3,28 @@ import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--maxEvents", help="Number of events to run", type=int, default=1000)
-parser.add_argument("-s", "--sample", help="Sample to use", choices=["SUSY200PU", "SUSY0PU"], default="SUSY200PU")
+parser.add_argument("-s", "--sample", help="Sample to use", choices=["SUSY200PU", "DMuGun200PU", "DMuGun0PU"], default="SUSY200PU")
 parser.add_argument("-t", "--nThreads", help="Number of cores/threads", type=int, default=1)
 parser.add_argument("-algo", "--algo", help="Algorithm to use", 
                     choices=["HYBRID", "HYBRID_DISPLACED", "HYBRID_NEWKF", "HYBRID_SIM_DISPLACED", "HYBRID_SIM"], default="HYBRID")
 parser.add_argument("--test", help="Create cfg without submission", action="store_true") 
 args = parser.parse_args()
 
-request_name = f"CMSSW20_{args.algo}_{args.sample}_{args.maxEvents}"
-base_out = 'crab_CMSSW_20_1_0_pre1'
+request_name = f"CMSSW15_{args.algo}_{args.sample}_{args.maxEvents}"
+base_out = 'crab_CMSSW_15_1_0_pre1'
 
 os.makedirs(base_out, exist_ok=True)
 cfg_path = os.path.join(base_out, 'crab_cfg.py')
 
 
-maxMem = 2000*args.nThreads
+maxMem = 2400*args.nThreads
 # maxTime = 150
 
 
 samples = {
-            "SUSY200PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
-            "SUSY0PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-150X_mcRun4_realistic_v1_STD_RegeneratedGS_D121_noPU-v1/GEN-SIM-DIGI-RAW"
+            "SUSY200PU":"/DisplacedSUSY_stopToBottom_M-800_50mm_TuneCP5_14TeV-pythia8/Phase2Spring24DIGIRECOMiniAOD-PU200_AllTP_140X_mcRun4_realistic_v4-v1/GEN-SIM-DIGI-RAW-MINIAOD",
+            "DMuGun0PU":"/RelValDoubleMuFlatPt1To100Dxy100GunProducer/CMSSW_15_1_0_pre5-150X_mcRun4_realistic_v1_RV269_Run4D110_noPU-v1/GEN-SIM-DIGI-RAW",
+            "DMuGun200PU":"/RelValDoubleMuFlatPt1To100Dxy100GunProducer/CMSSW_15_1_0_pre5-PU_150X_mcRun4_realistic_v1_RV269_Run4D110_PU-v1/GEN-SIM-DIGI-RAW",
           }
 
 # cli_params = [x for tup in [[f"-{x}",y] for x,y in list(vars(args).items())] for x in tup]
@@ -52,7 +53,7 @@ config.Data.splitting = 'Automatic'
 config.Data.totalUnits = {maxEvents}
 config.Data.publication = False
 
-config.Data.outLFNDirBase = '/store/user/nwhittin/crab_CMSSW_20_1_0_pre1/'
+config.Data.outLFNDirBase = '/store/user/nwhittin/crab_CMSSW_15_1_0_pre1/'
 config.Data.inputDataset = '{sample}'
 
 config.Site.storageSite = 'T3_CH_CERNBOX'
