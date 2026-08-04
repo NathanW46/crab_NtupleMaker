@@ -16,7 +16,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--maxEvents", help="Number of events to run", type=int, default=1000)
-parser.add_argument("-s", "--sample", help="Sample to use", choices=["SUSY200PU", "SUSY0PU"], default="SUSY200PU")
+parser.add_argument("-s", "--sample", help="Sample to use", choices=["SUSY200PU", "SUSY0PU", "ttbar200PU", "ttbar0PU"], default="SUSY200PU")
 parser.add_argument("-t", "--nThreads", help="Number of cores/threads", type=int, default=1)
 parser.add_argument("-algo", "--algo", help="Algorithm to use", 
                     choices=["HYBRID", "HYBRID_DISPLACED", "HYBRID_NEWKF", "HYBRID_SIM_DISPLACED", "HYBRID_SIM"], default="HYBRID")
