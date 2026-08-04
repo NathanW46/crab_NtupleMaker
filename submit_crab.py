@@ -23,7 +23,9 @@ maxMem = 2000*args.nThreads
 
 samples = {
             "SUSY200PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
-            "SUSY0PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-150X_mcRun4_realistic_v1_STD_RegeneratedGS_D121_noPU-v1/GEN-SIM-DIGI-RAW"
+            "SUSY0PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-150X_mcRun4_realistic_v1_STD_RegeneratedGS_D121_noPU-v1/GEN-SIM-DIGI-RAW",
+            "ttbar200PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
+            "ttbar0PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_pre1-150X_mcRun4_realistic_v1_STD_RegeneratedGS_D121_noPU-v1/GEN-SIM-DIGI-RAW",
           }
 
 # cli_params = [x for tup in [[f"-{x}",y] for x,y in list(vars(args).items())] for x in tup]
