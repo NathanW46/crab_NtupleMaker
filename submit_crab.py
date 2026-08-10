@@ -54,7 +54,7 @@ config.Data.splitting = 'Automatic'
 config.Data.totalUnits = {maxEvents}
 config.Data.publication = False
 
-config.Data.outLFNDirBase = '/store/user/nwhittin/crab_CMSSW_20_1_0_pre1/'
+config.Data.outLFNDirBase = '/store/user/nwhittin/{base_out}/'
 config.Data.inputDataset = '{sample}'
 
 config.Site.storageSite = 'T3_CH_CERNBOX'
