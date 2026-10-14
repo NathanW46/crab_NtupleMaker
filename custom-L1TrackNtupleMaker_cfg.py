@@ -18,8 +18,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--maxEvents", help="Number of events to run", type=int, default=1000)
 parser.add_argument("-s", "--sample", help="Sample to use", choices=["SUSY200PU", "SUSY0PU", "ttbar200PU", "ttbar0PU"], default="SUSY200PU")
 parser.add_argument("-t", "--nThreads", help="Number of cores/threads", type=int, default=1)
-parser.add_argument("-algo", "--algo", help="Algorithm to use", 
+parser.add_argument("--algo", help="Algorithm to use", 
                     choices=["HYBRID", "HYBRID_DISPLACED", "HYBRID_NEWKF", "HYBRID_SIM_DISPLACED", "HYBRID_SIM"], default="HYBRID")
+parser.add_argument("--tag", type=str, default=None, help="Optional filename tag")
+
 args = parser.parse_args()
 samples = {
             "SUSY200PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
@@ -27,7 +29,10 @@ samples = {
             "ttbar200PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
             "ttbar0PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_pre1-150X_mcRun4_realistic_v1_STD_RegeneratedGS_D121_noPU-v1/GEN-SIM-DIGI-RAW",
           }
-
+outfile = f"CMSSW20_{args.algo}_{args.sample}_{args.maxEvents}"
+if args.tag:
+    outfile += f"-{args.tag}"
+outfile += ".root"
 print(args)
 ############################################################
 # edit options here
@@ -107,7 +112,7 @@ process.source.inputCommands.append('drop  *_*_*Level1TTTracks*_*')
 # Use skipEvents to select particular single events for test vectors
 #process.source.skipEvents = cms.untracked.uint32(11)
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('L1TrkNtuple.root'), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string(outfile), closeFileFast = cms.untracked.bool(True))
 process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(True))
 
 

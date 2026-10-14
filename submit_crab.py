@@ -5,13 +5,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-n", "--maxEvents", help="Number of events to run", type=int, default=1000)
 parser.add_argument("-s", "--sample", help="Sample to use", choices=["SUSY200PU", "SUSY0PU", "ttbar200PU", "ttbar0PU"], default="SUSY200PU")
 parser.add_argument("-t", "--nThreads", help="Number of cores/threads", type=int, default=1)
-parser.add_argument("-algo", "--algo", help="Algorithm to use", 
+parser.add_argument("--algo", help="Algorithm to use", 
                     choices=["HYBRID", "HYBRID_DISPLACED", "HYBRID_NEWKF", "HYBRID_SIM_DISPLACED", "HYBRID_SIM"], default="HYBRID")
+parser.add_argument("--tag", type=str, default=None, help="Optional filename tag")
 parser.add_argument("--test", help="Create cfg without submission", action="store_true") 
 args = parser.parse_args()
 
 request_name = f"CMSSW20_{args.algo}_{args.sample}_{args.maxEvents}"
-base_out = 'crab_CMSSW_20_1_0_pre1'
+base_out = 'crab/crab_CMSSW_20_1_0_pre1'
+
+if args.tag:
+    request_name += f"-{args.tag}"
+    base_out += f"-{args.tag}"
 
 os.makedirs(base_out, exist_ok=True)
 cfg_path = os.path.join(base_out, 'crab_cfg.py')
@@ -29,7 +34,9 @@ samples = {
           }
 
 # cli_params = [x for tup in [[f"-{x}",y] for x,y in list(vars(args).items())] for x in tup]
-py_cfg_params = ["-n", str(args.maxEvents), "-t", str(args.nThreads), "-s", args.sample, "-algo", args.algo]
+py_cfg_params = ["-n", str(args.maxEvents), "-t", str(args.nThreads), "-s", args.sample, "--algo", args.algo] 
+if args.tag:
+    py_cfg_params += ["--tag", args.tag]
 
 crab_cfg = """\
 from CRABClient.UserUtilities import config
