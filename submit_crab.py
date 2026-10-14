@@ -50,6 +50,7 @@ config.JobType.pyCfgParams = {py_cfg_params}
 config.General.requestName = '{request_name}'
 config.General.workArea = '{base_out}'
 config.General.transferOutputs = True
+config.General.transferLogs = True
 config.JobType.psetName = 'custom-L1TrackNtupleMaker_cfg.py'
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.pluginName = 'Analysis'
