@@ -1,3 +1,4 @@
+
 ############################################################
 # THIS JOB RUNS THE L1 TRACKING ALGORITHM.
 # (Several alternative algorithms can be specified).
@@ -23,11 +24,18 @@ parser.add_argument("--algo", help="Algorithm to use",
 parser.add_argument("--tag", type=str, default=None, help="Optional filename tag")
 
 args = parser.parse_args()
+
+#copied from https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1TrackMC?extralog=-%20caching%20topic#CMSSW_20_1_0_pre1_or_very_simila
+# as of 2026-10-26
 samples = {
-            "SUSY200PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
-            "SUSY0PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_pre1-150X_mcRun4_realistic_v1_STD_RegeneratedGS_D121_noPU-v1/GEN-SIM-DIGI-RAW",
-            "ttbar200PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_pre1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU-v1/GEN-SIM-DIGI-RAW",
-            "ttbar0PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_pre1-150X_mcRun4_realistic_v1_STD_RegeneratedGS_D121_noPU-v1/GEN-SIM-DIGI-RAW",
+            "SUSY200PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_patch1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU_20260904_125332_RV11-v1/GEN-SIM-DIGI-RAW",
+     	    "SUSY0PU":"/RelValDisplacedSUSY_14TeV/CMSSW_20_0_0_patch1-150X_mcRun4_realistic_v1_Run4_D121_pp_noPU_STD_Reference_20260903_192421_RV19-v1/GEN-SIM-DIGI-RAW",
+         	"ttbar200PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_patch1-PU_150X_mcRun4_realistic_v1_STD_D121_RegeneratedGS_PU_20260904_125332_RV11-v1/GEN-SIM-DIGI-RAW",
+            "ttbar0PU":"/RelValTTbar_14TeV/CMSSW_20_0_0_patch1-150X_mcRun4_realistic_v1_Run4_D121_pp_noPU_STD_Reference_20260903_192421_RV19-v1/GEN-SIM-DIGI-RAW",
+            "dMuGun0PU":"/RelValDoubleMuFlatPt1To100Dxy100GunProducer/CMSSW_20_1_0_pre1-150X_mcRun4_realistic_v1_RV302_Run4D121_noPU-v1/GEN-SIM-DIGI-RAW",
+            "dMuGun200PU":"/RelValDoubleMuFlatPt1To100Dxy100GunProducer/CMSSW_20_1_0_pre1-PU_150X_mcRun4_realistic_v1_RV302_Run4D121_PU200-v1/GEN-SIM-DIGI-RAW"
+            "deGun0PU":"/RelValDoubleEFlatPt1To100Dxy100GunProducer/CMSSW_20_1_0_pre1-150X_mcRun4_realistic_v1_RV302_Run4D121_noPU-v1/GEN-SIM-DIGI-RAW",
+            "deGun200PU":"/RelValDoubleEFlatPt1To100Dxy100GunProducer/CMSSW_20_1_0_pre1-PU_150X_mcRun4_realistic_v1_RV302_Run4D121_PU200-v1/GEN-SIM-DIGI-RAW",
           }
 outfile = f"CMSSW20_{args.algo}_{args.sample}_{args.maxEvents}"
 if args.tag:
@@ -51,7 +59,6 @@ GEOMETRY = "D121"
 # (Or legacy algos 'TMTT' or 'TRACKLET').
 L1TRKALGO = args.algo
 process.options.numberOfThreads = args.nThreads
-
 # Write output dataset?
 WRITE_DATA = False
 
@@ -92,22 +99,13 @@ from MCsamples.Scripts.getCMSdata_cfi import *
 #from MCsamples.Scripts.getCMSlocaldata_cfi import *
 inputMC = getCMSdata(samples[args.sample])
 
-
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(*inputMC))
 
-# Drop previously reconstructed L1 tracks + their truth association to avoid risk of analysing them instead of new tracks created by this job.
+# To avoid confusion, drop previously reconstructed L1 tracks + their truth association.
 process.source.dropDescendantsOfDroppedBranches = cms.untracked.bool(False)
 process.source.inputCommands = cms.untracked.vstring()
 process.source.inputCommands.append('keep *_*_*_*')
-process.source.inputCommands.append('drop  *_*_*Level1TTTracks*_*')
-
-#  # If reading old MC dataset, it can help to drop incompatible EDProducts.
-#  process.source.inputCommands.append('drop *_*_*_*')
-#  process.source.inputCommands.append('keep *_*_*Level1TTTracks*_*')
-#  process.source.inputCommands.append('keep *_*_*StubAccepted*_*')
-#  process.source.inputCommands.append('keep *_*_*ClusterAccepted*_*')
-#  process.source.inputCommands.append('keep *_*_*MergedTrackTruth*_*')
-#  process.source.inputCommands.append('keep *_genParticles_*_*')
+process.source.inputCommands.append('drop  *_*TTTrack*_*_*')
 
 # Use skipEvents to select particular single events for test vectors
 #process.source.skipEvents = cms.untracked.uint32(11)
@@ -115,25 +113,21 @@ process.source.inputCommands.append('drop  *_*_*Level1TTTracks*_*')
 process.TFileService = cms.Service("TFileService", fileName = cms.string(outfile), closeFileFast = cms.untracked.bool(True))
 process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(True))
 
-
 ############################################################
 # L1 tracking: stubs / DTC emulation
 ############################################################
 
 process.load('L1Trigger.TrackTrigger.TrackTrigger_cff')
 
-# Load code needed to remake clusters + stubs + their association to truth,
+# Load code to remake clusters + stubs + their truth association,
 # in case user wants to remake them. 
-from L1Trigger.TrackTrigger.TTStubAlgorithmRegister_cfi import *
 process.load("SimTracker.TrackTriggerAssociation.TrackTriggerAssociator_cff")
-
-from SimTracker.TrackTriggerAssociation.TTClusterAssociation_cfi import *
-TTClusterAssociatorFromPixelDigis.digiSimLinks = cms.InputTag("simSiPixelDigis","Tracker")
+process.TTClusterAssociatorFromPixelDigis.digiSimLinks = cms.InputTag("simSiPixelDigis","Tracker")
 
 process.TTClusterStub = cms.Path(process.TrackTriggerClustersStubs)
 process.TTClusterStubTruth = cms.Path(process.TrackTriggerAssociatorClustersStubs)
 
-# load code that associates stubs with mctruth
+# load more code to associate stubs with mctruth
 process.load( 'SimTracker.TrackTriggerAssociation.StubAssociator_cff' )
 # load code that analyzes mc truth
 process.load( 'L1Trigger.TrackTrigger.AnalyzerMC_cff' )
@@ -192,8 +186,10 @@ elif (L1TRKALGO == 'HYBRID_NEWKF' or L1TRKALGO == 'HYBRID_REDUCED'):
     from L1Trigger.TrackFindingTracklet.Customize_cff import *
     if (L1TRKALGO == 'HYBRID_NEWKF'):
         fwConfig( process )
-        # cheats to get good performance
+        # Cheat to improve z0 resolution (bypass issues in Tracklet digitisation by using TTStubs)
         process.TrackFindingTrackletSetup.DR.UseTTStubs = True
+        # Cheat to investigate z0 resolution (after NEWKF's DR, do KF fit with OLDKF instead of NEWKF)
+        # oldKFConfig( process )
     if (L1TRKALGO == 'HYBRID_REDUCED'):
         reducedConfig( process )
     # Needed by L1TrackNtupleMaker
@@ -212,6 +208,10 @@ elif (L1TRKALGO == 'HYBRID_SIM'):
     process.TTTrackAssociatorFromPixelDigis.TTTracks = cms.VInputTag( cms.InputTag(L1TRK_NAME, L1TRK_LABEL) )
     from L1Trigger.TrackFindingTracklet.Customize_cff import *
     sim4Config( process )
+    # uncomment for 5 par + prompt seeds
+    # also set NHELIXPAR to 5 above
+    # process.TrackFindingTrackletSetup.Sim.NPar = 5
+
     process.Sim = cms.Sequence(process.L1THybridTracks + process.ProducerSim)
     process.TTTracksEmulationWithTruth = cms.Path(process.Sim + process.TrackTriggerAssociatorTracks + process.AnalyzerTracklet + process.AnalyzerSim)
     process.TTTracksEmulation = cms.Path(process.Sim)
@@ -240,35 +240,6 @@ elif (L1TRKALGO == 'HYBRID_SIM_DISPLACED'):
     process.TTTracksEmulationWithTruth = cms.Path(process.Sim + process.L1TExtendedHybridTracksWithAssociators + process.AnalyzerTracklet + process.AnalyzerSim)
     process.TTTracksEmulation = cms.Path(process.Sim)
 
-# LEGACY ALGORITHM (EXPERTS ONLY): TRACKLET
-elif (L1TRKALGO == 'TRACKLET'):
-    print("\n WARNING: This is not the baseline algorithm! Prefer HYBRID or HYBRID_DISPLACED!")
-    print("\n To run the Tracklet-only algorithm, ensure you have commented out 'CXXFLAGS=-DUSEHYBRID' in BuildFile.xml & recompiled! \n")
-    process.TTTracksEmulation = cms.Path(process.L1THybridTracks)
-    process.TTTracksEmulationWithTruth = cms.Path(process.L1THybridTracksWithAssociators)
-    from L1Trigger.TrackFindingTracklet.Customize_cff import *
-    trackletConfig( process )
-    NHELIXPAR = 4
-    L1TRK_NAME  = "l1tTTTracksFromTrackletEmulation"
-    L1TRK_LABEL = "Level1TTTracks"
-    L1TRUTH_NAME = "TTTrackAssociatorFromPixelDigis"
-
-# LEGACY ALGORITHM (EXPERTS ONLY): TMTT
-elif (L1TRKALGO == 'TMTT'):
-    print("\n WARNING: This is not the baseline algorithm! Prefer HYBRID or HYBRID_DISPLACED! \n")
-    process.load("L1Trigger.TrackFindingTMTT.TMTrackProducer_Ultimate_cff")
-    L1TRK_PROC  =  process.TMTrackProducer
-    L1TRK_NAME  = "TMTrackProducer"
-    L1TRK_LABEL = "TML1TracksKF4ParamsComb"
-    L1TRUTH_NAME = "TTTrackAssociatorFromPixelDigis"
-    NHELIXPAR = 4
-    L1TRK_PROC.EnableMCtruth = cms.bool(False) # Reduce CPU use by disabling internal histos.
-    L1TRK_PROC.EnableHistos  = cms.bool(False)
-    process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
-    process.load("SimTracker.TrackTriggerAssociation.TrackTriggerAssociator_cff")
-    process.TTTrackAssociatorFromPixelDigis.TTTracks = cms.VInputTag( cms.InputTag(L1TRK_NAME, L1TRK_LABEL) )
-    process.TTTracksEmulation = cms.Path(process.offlineBeamSpot*L1TRK_PROC)
-    process.TTTracksEmulationWithTruth = cms.Path(process.offlineBeamSpot*L1TRK_PROC*process.TrackTriggerAssociatorTracks)
 
 else:
     print("ERROR: Unknown L1TRKALGO option")
@@ -293,9 +264,12 @@ process.ana = cms.Path(process.L1TrackNtuple)
 # Run tracking + track associator
 process.schedule = cms.Schedule(process.dtc,process.TTTracksEmulationWithTruth,process.ana)
 
-# use this to re-run the cluster+stub making + truth association
-# (Not needed unless their format has changed or you want to change them)
-#process.schedule = cms.Schedule(process.TTClusterStub,process.TTClusterStubTruth,process.dtc,process.TTTracksEmulationWithTruth,process.ana)
+# Use this to re-run the cluster+stub making + truth association
+# (Not needed unless you want to change them)
+# To avoid confusion, drop existing info if you are doing this. 
+#process.source.inputCommands.append('drop  *_*TTCluster*_*_*')
+#process.source.inputCommands.append('drop  *_*TTStub*_*_*')
+#process.schedule = #cms.Schedule(process.TTClusterStub,process.TTClusterStubTruth,process.dtc,process.TTTracksEmulationWithTruth,process.ana)
 
 
 ############################################################
@@ -318,3 +292,6 @@ if (WRITE_DATA):
 
   process.pd = cms.EndPath(process.writeDataset)
   process.schedule.append(process.pd)
+
+
+
